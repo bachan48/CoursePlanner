@@ -26,20 +26,45 @@ const App = () => {
           path="/"
           element={
             <ProtectedRoute>
-              <Routes>
-                <Route path="/" element={<Dashboard />} />
-                <Route path="courses" element={<Courses />} />
-                <Route path="courses/:id" element={<CourseDetail />} />
-                <Route path="deliverables" element={<Deliverables />} />
-                <Route path="schedule" element={<Schedule />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
+              <Dashboard />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses"
+          element={
+            <ProtectedRoute>
+              <Courses />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/courses/:id"
+          element={
+            <ProtectedRoute>
+              <CourseDetail />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/deliverables"
+          element={
+            <ProtectedRoute>
+              <Deliverables />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/schedule"
+          element={
+            <ProtectedRoute>
+              <Schedule />
             </ProtectedRoute>
           }
         />
 
-        {/* Catch-all for unauthenticated users */}
-        <Route path="*" element={<Navigate to="/login" replace />} />
+        {/* 404 Not Found */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
       <Toaster position="top-right" />
     </AuthProvider>

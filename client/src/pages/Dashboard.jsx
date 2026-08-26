@@ -1,8 +1,10 @@
 import { useCourses, useDeliverables, useSchedule } from '../hooks';
+import { useNavigate } from 'react-router-dom';
 import MainLayout from '../components/layout/MainLayout';
 import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
+  const navigate = useNavigate();
   const { courses, loading: coursesLoading, stats } = useCourses();
   const { deliverables, loading: deliverablesLoading } = useDeliverables();
   const { scheduleItems, loading: scheduleLoading } = useSchedule();
@@ -75,7 +77,12 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statCards.map((stat, index) => (
-            <div key={index} className="card">
+            <div key={index} className="card cursor-pointer hover:shadow-md transition-shadow" onClick={() => {
+              if (index === 0) navigate('/courses');
+              else if (index === 1) navigate('/courses');
+              else if (index === 2) navigate('/deliverables');
+              else if (index === 3) navigate('/schedule');
+            }}>
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-slate-600">{stat.title}</p>
