@@ -61,9 +61,11 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-slate-50 px-4">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-            <span className="text-white font-bold text-2xl">C</span>
-          </div>
+          <img 
+            src="https://inspireuvic.org/wp-content/uploads/2023/12/logo.png" 
+            alt="Inspire Logo" 
+            className="h-16 w-auto mx-auto mb-4" 
+          />
           <h1 className="text-3xl font-bold text-slate-900">Welcome Back</h1>
           <p className="text-slate-600 mt-2">Sign in to your Course Planner account</p>
         </div>
