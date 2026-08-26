@@ -30,3 +30,7 @@ coverage/
 
 # Backup files
 *.bak
+
+# Startup scripts
+start.ps1
+start.bat

@@ -46,9 +46,14 @@ const Register = () => {
         state: { message: 'Registration successful! Please check your email to verify your account.' },
       });
     } catch (err) {
-      setError(
-        err.response?.data?.message || 'Registration failed. Please try again.'
-      );
+      const errorMsg = err.response?.data?.message || 'Registration failed. Please try again.';
+      if (errorMsg.includes('already exists')) {
+        navigate('/login', {
+          state: { message: 'Account already exists. Please sign in instead.' },
+        });
+        return;
+      }
+      setError(errorMsg);
     } finally {
       setLoading(false);
     }

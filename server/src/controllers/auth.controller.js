@@ -21,15 +21,16 @@ export const register = async (req, res, next) => {
     // Generate verification token
     const verificationToken = crypto.randomBytes(32).toString('hex');
 
-    // Create user
+    // Create user (auto-verify for MVP)
     const user = await User.create({
       username,
       email,
       password,
+      isVerified: true,
       verificationToken,
     });
 
-    // Send verification email
+    // Send verification email (non-blocking, logged only)
     try {
       await sendVerificationEmail(user.email, user.username, verificationToken);
     } catch (emailError) {
@@ -39,7 +40,7 @@ export const register = async (req, res, next) => {
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful. Please check your email to verify your account.',
+      message: 'Registration successful.',
       userId: user._id,
     });
   } catch (error) {

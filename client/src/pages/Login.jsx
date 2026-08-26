@@ -1,17 +1,37 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useState, useEffect } from 'react';
+import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 
 const Login = () => {
+  const location = useLocation();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
   });
   const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [formLoading, setFormLoading] = useState(false);
 
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
+
+  // Navigate to dashboard when authentication state changes
+  useEffect(() => {
+    if (isAuthenticated && location.pathname === '/login') {
+      navigate('/', { replace: true });
+    }
+  }, [isAuthenticated, navigate, location.pathname]);
+
+  // Display redirect message (e.g. "account exists, please login")
+  const redirectMessage = location.state?.message;
+
+  useEffect(() => {
+    if (redirectMessage) {
+      const timer = setTimeout(() => {
+        window.history.replaceState({}, '', window.location.pathname);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [redirectMessage]);
 
   const handleChange = (e) => {
     setFormData({
@@ -24,17 +44,16 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setLoading(true);
+    setFormLoading(true);
 
     try {
       await login(formData.email, formData.password);
-      navigate('/');
     } catch (err) {
       setError(
         err.response?.data?.message || 'Failed to login. Please check your credentials.'
       );
     } finally {
-      setLoading(false);
+      setFormLoading(false);
     }
   };
 
@@ -51,6 +70,11 @@ const Login = () => {
 
         <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-8">
           <form onSubmit={handleSubmit} className="space-y-6">
+            {redirectMessage && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-700 px-4 py-3 rounded-lg text-sm">
+                {redirectMessage}
+              </div>
+            )}
             {error && (
               <div className="bg-rose-50 border border-rose-200 text-rose-700 px-4 py-3 rounded-lg text-sm">
                 {error}
@@ -93,10 +117,10 @@ const Login = () => {
 
             <button
               type="submit"
-              disabled={loading}
+              disabled={formLoading}
               className="btn-primary w-full py-3"
             >
-              {loading ? (
+              {formLoading ? (
                 <div className="flex items-center justify-center space-x-2">
                   <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
                   <span>Signing in...</span>

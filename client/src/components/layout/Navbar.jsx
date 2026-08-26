@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from '../../context/AuthContext';
 
 const Navbar = () => {
   const { user, logout } = useAuth();
@@ -41,6 +41,12 @@ const Navbar = () => {
               className="text-slate-600 hover:text-slate-900 font-medium px-3 py-2 rounded-md transition-colors"
             >
               Schedule
+            </Link>
+            <Link
+              to="/deliverables"
+              className="text-slate-600 hover:text-slate-900 font-medium px-3 py-2 rounded-md transition-colors"
+            >
+              Deliverables
             </Link>
 
             <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-slate-200">

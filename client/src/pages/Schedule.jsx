@@ -58,11 +58,10 @@ const Schedule = () => {
   };
 
   const getItemsForSlot = (day, time) => {
-    const dayOfWeek = days.indexOf(day);
     return scheduleItems.filter((item) => {
-      const itemDay = new Date(item.day).getDay();
-      const itemHour = parseInt(item.startTime?.split(':')[0]) || 0;
-      return itemDay === dayOfWeek && itemHour === parseInt(time);
+      const itemDayName = item.day;
+      const itemStartHour = parseInt(item.startTime?.split(':')[0]) || 0;
+      return itemDayName === day && itemStartHour === parseInt(time);
     });
   };
 
@@ -134,7 +133,7 @@ const Schedule = () => {
                               {item.location && <p className="text-xs text-slate-400 truncate">{item.location}</p>}
                             </div>
                           ))}
-                          <button onClick={() => { setEditingItem({ day: days.indexOf(day), startTime: `${time}:00`, course: '' }); setShowModal(true); }} className="w-full py-1 text-slate-300 hover:text-primary-500 transition-colors text-lg" title="Add on">+</button>
+                          <button onClick={() => { setEditingItem({ day: day, startTime: `${time}:00`, course: '' }); setShowModal(true); }} className="w-full py-1 text-slate-300 hover:text-primary-500 transition-colors text-lg" title="Add on">+</button>
                         </td>
                       );
                     })}
@@ -187,9 +186,12 @@ const Schedule = () => {
                 onSubmit={async (e) => {
                   e.preventDefault();
                   const formData = Object.fromEntries(new FormData(e.target).entries());
-                  data.day = editingItem?.day ?? 0;
-                  data.color = editingItem?.color || '#3b82f6';
-                  await (editingItem ? handleUpdate(formData) : handleCreate(formData));
+                  const data = {
+                    ...formData,
+                    day: editingItem?.day || 'Monday',
+                    color: editingItem?.color || '#3b82f6',
+                  };
+                  await (editingItem ? handleUpdate(data) : handleCreate(data));
                 }}
                 className="space-y-4"
               >
@@ -215,11 +217,11 @@ const Schedule = () => {
                   <select
                     name="day"
                     required
-                    defaultValue={editingItem?.day ?? 0}
+                    defaultValue={editingItem?.day ?? 'Monday'}
                     className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                   >
-                    {days.map((day, index) => (
-                      <option key={index} value={index}>{day}</option>
+                    {days.map((day) => (
+                      <option key={day} value={day}>{day}</option>
                     ))}
                   </select>
                 </div>

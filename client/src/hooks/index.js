@@ -1,3 +1,3 @@
-export { default as useCourses } from './useCourses';
-export { default as useDeliverables } from './useDeliverables';
-export { default as useSchedule } from './useSchedule';
+export { useCourses } from './useCourses';
+export { useDeliverables } from './useDeliverables';
+export { useSchedule } from './useSchedule';
