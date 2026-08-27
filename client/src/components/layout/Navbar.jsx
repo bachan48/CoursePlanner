@@ -25,28 +25,10 @@ const Navbar = () => {
 
           <div className="flex items-center space-x-4">
             <Link
-              to="/"
-              className="text-slate-600 hover:text-slate-900 font-medium px-3 py-2 rounded-md transition-colors"
-            >
-              Dashboard
-            </Link>
-            <Link
               to="/courses"
               className="text-slate-600 hover:text-slate-900 font-medium px-3 py-2 rounded-md transition-colors"
             >
               Courses
-            </Link>
-            <Link
-              to="/schedule"
-              className="text-slate-600 hover:text-slate-900 font-medium px-3 py-2 rounded-md transition-colors"
-            >
-              Schedule
-            </Link>
-            <Link
-              to="/deliverables"
-              className="text-slate-600 hover:text-slate-900 font-medium px-3 py-2 rounded-md transition-colors"
-            >
-              Deliverables
             </Link>
 
             <div className="flex items-center space-x-2 ml-4 pl-4 border-l border-slate-200">

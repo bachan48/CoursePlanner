@@ -1,14 +1,14 @@
 import { useState } from 'react';
 
-const CourseForm = ({ initialData = {}, onSubmit, onCancel }) => {
+const CourseForm = ({ initialData = {}, semesters = [], onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
     title: initialData.title || '',
     code: initialData.code || '',
     description: initialData.description || '',
-    credits: initialData.credits || 3,
+    credits: initialData.credits ?? 3,
     instructor: initialData.instructor || '',
-    semester: initialData.semester || '',
-    color: initialData.color || '#3b82f6',
+    semester: initialData.semester?._id || initialData.semester || '',
+    color: initialData.color || '#4F46E5',
   });
 
   const handleChange = (e) => {
@@ -24,6 +24,22 @@ const CourseForm = ({ initialData = {}, onSubmit, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Semester *</label>
+        <select
+          name="semester"
+          value={formData.semester}
+          onChange={handleChange}
+          required
+          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+        >
+          <option value="">Select a semester</option>
+          {semesters.map((semester) => (
+            <option key={semester._id} value={semester._id}>{semester.name}</option>
+          ))}
+        </select>
+      </div>
+
+      <div>
         <label className="block text-sm font-medium text-slate-700 mb-1">Course Title *</label>
         <input
           type="text"
@@ -32,7 +48,7 @@ const CourseForm = ({ initialData = {}, onSubmit, onCancel }) => {
           onChange={handleChange}
           required
           className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="e.g., Introduction to Computer Science"
+          placeholder="e.g., Software Engineering Project"
         />
       </div>
 
@@ -46,7 +62,7 @@ const CourseForm = ({ initialData = {}, onSubmit, onCancel }) => {
             onChange={handleChange}
             required
             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="e.g., CS101"
+            placeholder="e.g., SENG480B"
           />
         </div>
         <div>
@@ -58,34 +74,22 @@ const CourseForm = ({ initialData = {}, onSubmit, onCancel }) => {
             onChange={handleChange}
             required
             min="0"
-            max="10"
+            max="20"
             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
           />
         </div>
       </div>
 
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Instructor</label>
-        <input
-          type="text"
-          name="instructor"
-          value={formData.instructor}
-          onChange={handleChange}
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="e.g., Dr. Smith"
-        />
-      </div>
-
       <div className="grid grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-slate-700 mb-1">Semester</label>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Instructor</label>
           <input
             type="text"
-            name="semester"
-            value={formData.semester}
+            name="instructor"
+            value={formData.instructor}
             onChange={handleChange}
             className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-            placeholder="e.g., Fall 2024"
+            placeholder="e.g., Dr. Smith"
           />
         </div>
         <div>

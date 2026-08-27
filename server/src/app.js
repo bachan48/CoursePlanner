@@ -3,9 +3,13 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import { errorHandler, notFound } from './middleware/errorHandler.js';
 import authRoutes from './routes/auth.routes.js';
+import semesterRoutes from './routes/semester.routes.js';
 import courseRoutes from './routes/course.routes.js';
+import classScheduleRoutes from './routes/classSchedule.routes.js';
+import sessionRoutes from './routes/session.routes.js';
+import weekRoutes from './routes/week.routes.js';
+import sprintRoutes from './routes/sprint.routes.js';
 import deliverableRoutes from './routes/deliverable.routes.js';
-import scheduleRoutes from './routes/schedule.routes.js';
 
 dotenv.config();
 
@@ -21,9 +25,13 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/semesters', semesterRoutes);
 app.use('/api/courses', courseRoutes);
+app.use('/api/class-schedules', classScheduleRoutes);
+app.use('/api/sessions', sessionRoutes);
+app.use('/api/weeks', weekRoutes);
+app.use('/api/sprints', sprintRoutes);
 app.use('/api/deliverables', deliverableRoutes);
-app.use('/api/schedule', scheduleRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

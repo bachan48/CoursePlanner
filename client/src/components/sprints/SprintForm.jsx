@@ -1,10 +1,9 @@
 import { useState } from 'react';
 
-const DeliverableForm = ({ initialData = {}, onSubmit, onCancel }) => {
+const SprintForm = ({ initialData = {}, onSubmit, onCancel }) => {
   const [formData, setFormData] = useState({
-    title: initialData.title || '',
+    name: initialData.name || '',
     description: initialData.description || '',
-    dueDate: initialData.dueDate ? new Date(initialData.dueDate).toISOString().split('T')[0] : '',
   });
 
   const handleChange = (e) => {
@@ -20,27 +19,15 @@ const DeliverableForm = ({ initialData = {}, onSubmit, onCancel }) => {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Title *</label>
+        <label className="block text-sm font-medium text-slate-700 mb-1">Sprint Name *</label>
         <input
           type="text"
-          name="title"
-          value={formData.title}
+          name="name"
+          value={formData.name}
           onChange={handleChange}
           required
           className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-          placeholder="e.g., Sprint 1 Demo"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium text-slate-700 mb-1">Due Date *</label>
-        <input
-          type="date"
-          name="dueDate"
-          value={formData.dueDate}
-          onChange={handleChange}
-          required
-          className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+          placeholder="e.g., Sprint 1"
         />
       </div>
 
@@ -52,7 +39,7 @@ const DeliverableForm = ({ initialData = {}, onSubmit, onCancel }) => {
           onChange={handleChange}
           rows="3"
           className="w-full px-3 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent resize-none"
-          placeholder="Expected output / details..."
+          placeholder="Expected output for this sprint..."
         />
       </div>
 
@@ -70,11 +57,11 @@ const DeliverableForm = ({ initialData = {}, onSubmit, onCancel }) => {
           type="submit"
           className="px-4 py-2 text-sm font-medium text-white bg-primary-600 rounded-lg hover:bg-primary-700 transition-colors"
         >
-          {initialData._id ? 'Update Deliverable' : 'Add Deliverable'}
+          {initialData._id ? 'Update Sprint' : 'Create Sprint'}
         </button>
       </div>
     </form>
   );
 };
 
-export default DeliverableForm;
+export default SprintForm;

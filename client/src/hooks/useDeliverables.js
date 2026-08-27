@@ -1,16 +1,18 @@
 import { useState, useEffect, useCallback } from 'react';
 import { deliverableAPI } from '../services/api';
 
-export const useDeliverables = () => {
+export const useDeliverables = (params = {}) => {
+  const { sprint, course } = params;
+
   const [deliverables, setDeliverables] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchDeliverables = useCallback(async (params = {}) => {
+  const fetchDeliverables = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await deliverableAPI.getAll(params);
+      const response = await deliverableAPI.getAll({ sprint, course });
       setDeliverables(response.data.data || []);
       return response.data.data;
     } catch (err) {
@@ -19,49 +21,23 @@ export const useDeliverables = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
-
-  const fetchUpcoming = useCallback(async (days = 7) => {
-    try {
-      const response = await deliverableAPI.getUpcoming(days);
-      return response.data.data || [];
-    } catch (err) {
-      console.error('Failed to fetch upcoming deliverables:', err);
-      return [];
-    }
-  }, []);
+  }, [sprint, course]);
 
   const createDeliverable = useCallback(async (data) => {
-    try {
-      const response = await deliverableAPI.create(data);
-      setDeliverables(prev => [response.data.data, ...prev]);
-      return response.data.data;
-    } catch (err) {
-      throw err;
-    }
+    const response = await deliverableAPI.create(data);
+    setDeliverables((prev) => [...prev, response.data.data]);
+    return response.data.data;
   }, []);
 
   const updateDeliverable = useCallback(async (id, data) => {
-    try {
-      const response = await deliverableAPI.update(id, data);
-      setDeliverables(prev =>
-        prev.map(del =>
-          del._id === id ? response.data.data : del
-        )
-      );
-      return response.data.data;
-    } catch (err) {
-      throw err;
-    }
+    const response = await deliverableAPI.update(id, data);
+    setDeliverables((prev) => prev.map((d) => (d._id === id ? response.data.data : d)));
+    return response.data.data;
   }, []);
 
   const deleteDeliverable = useCallback(async (id) => {
-    try {
-      await deliverableAPI.delete(id);
-      setDeliverables(prev => prev.filter(del => del._id !== id));
-    } catch (err) {
-      throw err;
-    }
+    await deliverableAPI.delete(id);
+    setDeliverables((prev) => prev.filter((d) => d._id !== id));
   }, []);
 
   useEffect(() => {
@@ -73,7 +49,6 @@ export const useDeliverables = () => {
     loading,
     error,
     fetchDeliverables,
-    fetchUpcoming,
     createDeliverable,
     updateDeliverable,
     deleteDeliverable,

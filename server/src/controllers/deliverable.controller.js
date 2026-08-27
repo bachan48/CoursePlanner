@@ -1,47 +1,18 @@
 import Deliverable from '../models/Deliverable.js';
+import Sprint from '../models/Sprint.js';
 
-// @desc    Get all deliverables for a user
-// @route   GET /api/deliverables
+// @desc    Get deliverables (scoped by sprint or course)
+// @route   GET /api/deliverables?sprint=&course=
 // @access  Private
 export const getDeliverables = async (req, res) => {
   try {
-    const { courseId, upcoming, completed, sortBy } = req.query;
-    const query = { user: req.user.id, isDeleted: false };
+    const { sprint, course } = req.query;
+    const query = { user: req.user.id };
+    if (sprint) query.sprint = sprint;
+    if (course) query.course = course;
 
-    if (courseId) {
-      query.course = courseId;
-    }
-
-    if (upcoming === 'true') {
-      query.dueDate = { $gte: new Date() };
-      query.isCompleted = false;
-    }
-
-    if (completed === 'true') {
-      query.isCompleted = true;
-    } else if (completed === 'false') {
-      query.isCompleted = false;
-    }
-
-    const sortOptions = {};
-    if (sortBy === 'dueDate') {
-      sortOptions.dueDate = 1;
-    } else if (sortBy === 'createdAt') {
-      sortOptions.createdAt = -1;
-    } else {
-      sortOptions.dueDate = 1;
-    }
-
-    const deliverables = await Deliverable.find(query)
-      .sort(sortOptions)
-      .populate('course', 'title code color')
-      .select('-__v');
-
-    res.json({
-      success: true,
-      count: deliverables.length,
-      data: deliverables,
-    });
+    const deliverables = await Deliverable.find(query).sort({ dueDate: 1 }).select('-__v');
+    res.json({ success: true, count: deliverables.length, data: deliverables });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -51,73 +22,21 @@ export const getDeliverables = async (req, res) => {
   }
 };
 
-// @desc    Get single deliverable
-// @route   GET /api/deliverables/:id
-// @access  Private
-export const getDeliverable = async (req, res) => {
-  try {
-    const deliverable = await Deliverable.findOne({
-      _id: req.params.id,
-      user: req.user.id,
-      isDeleted: false,
-    })
-      .populate('course', 'title code color instructor')
-      .select('-__v');
-
-    if (!deliverable) {
-      return res.status(404).json({
-        success: false,
-        message: 'Deliverable not found',
-      });
-    }
-
-    res.json({
-      success: true,
-      data: deliverable,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching deliverable',
-      error: error.message,
-    });
-  }
-};
-
-// @desc    Create new deliverable
+// @desc    Create a deliverable attached to a sprint
 // @route   POST /api/deliverables
 // @access  Private
 export const createDeliverable = async (req, res) => {
   try {
-    // Verify course belongs to user
-    const courseModel = (await import('../models/Course.js')).default;
-    const course = await courseModel.findOne({
-      _id: req.body.course,
-      user: req.user.id,
-      isDeleted: false,
-    });
-
-    if (!course) {
-      return res.status(404).json({
-        success: false,
-        message: 'Course not found',
-      });
+    const sprint = await Sprint.findOne({ _id: req.body.sprint, user: req.user.id });
+    if (!sprint) {
+      return res.status(404).json({ success: false, message: 'Sprint not found' });
+    }
+    if (String(sprint.course) !== String(req.body.course)) {
+      return res.status(400).json({ success: false, message: 'Sprint does not belong to this course' });
     }
 
-    const deliverable = await Deliverable.create({
-      ...req.body,
-      user: req.user.id,
-    });
-
-    // Populate course info for response
-    const populatedDeliverable = await Deliverable.findById(deliverable._id)
-      .populate('course', 'title code color')
-      .select('-__v');
-
-    res.status(201).json({
-      success: true,
-      data: populatedDeliverable,
-    });
+    const deliverable = await Deliverable.create({ ...req.body, user: req.user.id });
+    res.status(201).json({ success: true, data: deliverable });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -127,39 +46,22 @@ export const createDeliverable = async (req, res) => {
   }
 };
 
-// @desc    Update deliverable
+// @desc    Update a deliverable
 // @route   PUT /api/deliverables/:id
 // @access  Private
 export const updateDeliverable = async (req, res) => {
   try {
-    const deliverable = await Deliverable.findOne({
-      _id: req.params.id,
-      user: req.user.id,
-      isDeleted: false,
-    });
-
+    const deliverable = await Deliverable.findOne({ _id: req.params.id, user: req.user.id });
     if (!deliverable) {
-      return res.status(404).json({
-        success: false,
-        message: 'Deliverable not found',
-      });
+      return res.status(404).json({ success: false, message: 'Deliverable not found' });
     }
 
-    const updatedDeliverable = await Deliverable.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      {
-        new: true,
-        runValidators: true,
-      }
-    )
-      .populate('course', 'title code color')
-      .select('-__v');
+    const updated = await Deliverable.findByIdAndUpdate(req.params.id, req.body, {
+      new: true,
+      runValidators: true,
+    }).select('-__v');
 
-    res.json({
-      success: true,
-      data: updatedDeliverable,
-    });
+    res.json({ success: true, data: updated });
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -169,70 +71,22 @@ export const updateDeliverable = async (req, res) => {
   }
 };
 
-// @desc    Delete deliverable (soft delete)
+// @desc    Delete a deliverable
 // @route   DELETE /api/deliverables/:id
 // @access  Private
 export const deleteDeliverable = async (req, res) => {
   try {
-    const deliverable = await Deliverable.findOne({
-      _id: req.params.id,
-      user: req.user.id,
-      isDeleted: false,
-    });
-
+    const deliverable = await Deliverable.findOne({ _id: req.params.id, user: req.user.id });
     if (!deliverable) {
-      return res.status(404).json({
-        success: false,
-        message: 'Deliverable not found',
-      });
+      return res.status(404).json({ success: false, message: 'Deliverable not found' });
     }
 
-    deliverable.isDeleted = true;
-    await deliverable.save();
-
-    res.json({
-      success: true,
-      message: 'Deliverable deleted successfully',
-    });
+    await deliverable.deleteOne();
+    res.json({ success: true, message: 'Deliverable deleted successfully' });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Server error while deleting deliverable',
-      error: error.message,
-    });
-  }
-};
-
-// @desc    Get upcoming deliverables
-// @route   GET /api/deliverables/upcoming
-// @access  Private
-export const getUpcomingDeliverables = async (req, res) => {
-  try {
-    const daysAhead = parseInt(req.query.days) || 7;
-    const startDate = new Date();
-    const endDate = new Date();
-    endDate.setDate(startDate.getDate() + daysAhead);
-
-    const deliverables = await Deliverable.find({
-      user: req.user.id,
-      isDeleted: false,
-      isCompleted: false,
-      dueDate: { $gte: startDate, $lte: endDate },
-    })
-      .sort({ dueDate: 1 })
-      .populate('course', 'title code color')
-      .select('-__v')
-      .limit(10);
-
-    res.json({
-      success: true,
-      count: deliverables.length,
-      data: deliverables,
-    });
-  } catch (error) {
-    res.status(500).json({
-      success: false,
-      message: 'Server error while fetching upcoming deliverables',
       error: error.message,
     });
   }

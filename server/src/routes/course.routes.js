@@ -5,7 +5,7 @@ import {
   createCourse,
   updateCourse,
   deleteCourse,
-  getCourseStats,
+  regenerateWeeks,
 } from '../controllers/course.controller.js';
 import { protect } from '../middleware/auth.middleware.js';
 import { courseSchema } from '../utils/authSchemas.js';
@@ -16,10 +16,10 @@ const router = express.Router();
 router.use(protect);
 
 router.get('/', getCourses);
-router.get('/stats', getCourseStats);
 router.get('/:id', getCourse);
 router.post('/', validate(courseSchema), createCourse);
 router.put('/:id', validate(courseSchema), updateCourse);
+router.post('/:id/regenerate-weeks', regenerateWeeks);
 router.delete('/:id', deleteCourse);
 
 export default router;

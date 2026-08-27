@@ -8,6 +8,12 @@ const courseSchema = new mongoose.Schema(
       required: true,
       index: true,
     },
+    semester: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Semester',
+      required: [true, 'Semester is required'],
+      index: true,
+    },
     title: {
       type: String,
       required: [true, 'Course title is required'],
@@ -19,7 +25,7 @@ const courseSchema = new mongoose.Schema(
       required: [true, 'Course code is required'],
       trim: true,
       uppercase: true,
-      match: [/^[A-Z]{2,6}\d{2,4}$/, 'Please provide a valid course code (e.g., CS101, MATH201)'],
+      match: [/^[A-Z]{2,6}\d{2,4}[A-Z]?$/, 'Please provide a valid course code (e.g., CS101, SENG480B)'],
     },
     credits: {
       type: Number,
@@ -43,29 +49,6 @@ const courseSchema = new mongoose.Schema(
       default: '#4F46E5',
       match: [/^#[0-9A-Fa-f]{6}$/, 'Color must be a valid hex color'],
     },
-    semester: {
-      type: String,
-      trim: true,
-      default: '',
-    },
-    days: {
-      type: [String],
-      validate: {
-        validator: function (v) {
-          const validDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
-          return v.every(day => validDays.includes(day));
-        },
-        message: 'Invalid day in schedule',
-      },
-      default: [],
-    },
-    timeSlots: {
-      type: [{
-        start: { type: String, required: true },
-        end: { type: String, required: true },
-      }],
-      default: [],
-    },
     isDeleted: {
       type: Boolean,
       default: false,
@@ -78,6 +61,7 @@ const courseSchema = new mongoose.Schema(
 
 // Compound index for efficient queries
 courseSchema.index({ user: 1, isDeleted: 1 });
+courseSchema.index({ user: 1, semester: 1, isDeleted: 1 });
 courseSchema.index({ user: 1, code: 1 }, { unique: true, partialFilterExpression: { isDeleted: false } });
 
 export default mongoose.model('Course', courseSchema);

@@ -1,12 +1,10 @@
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './context/AuthContext';
 import ProtectedRoute from './components/auth/ProtectedRoute';
-import Dashboard from './pages/Dashboard';
-import Courses from './pages/Courses';
+import CourseList from './pages/CourseList';
 import CourseDetail from './pages/CourseDetail';
-import Deliverables from './pages/Deliverables';
-import Schedule from './pages/Schedule';
+import WeekPage from './pages/WeekPage';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import VerifyEmail from './pages/VerifyEmail';
@@ -20,13 +18,14 @@ const App = () => {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/verify-email" element={<VerifyEmail />} />
+        <Route path="/verify-email/:token" element={<VerifyEmail />} />
 
         {/* Protected Routes */}
         <Route
           path="/"
           element={
             <ProtectedRoute>
-              <Dashboard />
+              <CourseList />
             </ProtectedRoute>
           }
         />
@@ -34,7 +33,7 @@ const App = () => {
           path="/courses"
           element={
             <ProtectedRoute>
-              <Courses />
+              <CourseList />
             </ProtectedRoute>
           }
         />
@@ -47,18 +46,10 @@ const App = () => {
           }
         />
         <Route
-          path="/deliverables"
+          path="/courses/:courseId/weeks/:weekNumber"
           element={
             <ProtectedRoute>
-              <Deliverables />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/schedule"
-          element={
-            <ProtectedRoute>
-              <Schedule />
+              <WeekPage />
             </ProtectedRoute>
           }
         />

@@ -1,10 +1,21 @@
 import { format, formatDistanceToNow, parseISO, isPast, isFuture } from 'date-fns';
 
+// Calendar-date fields from the API (semester/week start-end, session date,
+// deliverable dueDate) are stored as UTC midnight - they represent a day, not
+// an exact instant. Reading them with local-time getters (what date-fns'
+// `format` does) shifts the displayed day back by one for any viewer whose
+// timezone is behind UTC. This re-bases the UTC Y/M/D onto a local midnight
+// Date so formatting/getters always agree with the calendar date on record.
+const toCalendarDate = (date) => {
+  const d = typeof date === 'string' ? parseISO(date) : date;
+  return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+};
+
 // Format date to readable string
 export const formatDate = (date, dateFormat = 'PPP') => {
   if (!date) return 'N/A';
   try {
-    return format(parseISO(date), dateFormat);
+    return format(toCalendarDate(date), dateFormat);
   } catch (error) {
     return 'Invalid date';
   }
@@ -119,6 +130,14 @@ export const getDayNumber = (dayName) => {
   return days.indexOf(dayName);
 };
 
+// Day-of-week (0=Sunday..6=Saturday) for a UTC-midnight calendar-date field.
+// Use instead of `new Date(value).getDay()`, which reads the local-time day
+// and can be off by one for viewers behind UTC.
+export const getCalendarDayOfWeek = (date) => {
+  const d = typeof date === 'string' ? parseISO(date) : date;
+  return d.getUTCDay();
+};
+
 // Format file size
 export const formatFileSize = (bytes) => {
   if (bytes === 0) return '0 Bytes';
@@ -141,6 +160,7 @@ export default {
   getPriorityColor,
   getStatusColor,
   getDayName,
+  getCalendarDayOfWeek,
   getDayNumber,
   formatFileSize,
 };
