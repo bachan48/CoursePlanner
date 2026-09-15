@@ -8,6 +8,10 @@ dist/
 .next/
 out/
 
+# Local .env files (keep .env.example as template)
+*.env
+!*.env.example
+
 # IDE
 .vscode/
 .idea/
@@ -32,5 +36,4 @@ coverage/
 *.bak
 
 # Startup scripts
-start.ps1
 start.bat
